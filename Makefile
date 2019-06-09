@@ -1,5 +1,5 @@
-CXXPARAMS = -Wall -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
-ASMPARAMS = -f elf64
+CXXPARAMS = -m32 -Wall -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
+ASMPARAMS = -f elf32
 LDPARAMS = 
 CXXC = g++
 ASMC = nasm
@@ -15,7 +15,7 @@ mykernel.bin: src/linker.ld $(OBJECTS)
 	ld $(LDPARAMS) -T $< -o $@ src/*.o
 
 mykernel.iso: mykernel.bin
-	cp mykernel.bin iso/boot/mykernel.bin                              >> iso/boot/grub/grub.cfg
+	cp mykernel.bin iso/boot/mykernel.bin
 	grub-mkrescue --output=mykernel.iso iso
 
 clean:

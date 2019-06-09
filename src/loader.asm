@@ -1,5 +1,3 @@
-BITS 64
-
 %define MAGIC 0x1badb002
 %define FLAGS (1<<0 | 1<<1)
 %define CHECKSUM -(MAGIC + FLAGS)
@@ -17,8 +15,8 @@ global loader
 loader:
     mov esp, kernel_stack
     call callConstructors
-    push rax
-    push rbx 
+    push eax
+    push ebx 
     call kernelMain
     cli
     hlt
