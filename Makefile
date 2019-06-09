@@ -15,7 +15,7 @@ mykernel.bin: src/linker.ld $(OBJECTS)
 	ld $(LDPARAMS) -T $< -o $@ src/*.o
 
 mykernel.iso: mykernel.bin
-	cp mykernel.bin iso/boot/mykernel.bin                              >> iso/boot/grub/grub.cfg
+	cp mykernel.bin iso/boot/mykernel.bin
 	grub-mkrescue --output=mykernel.iso iso
 
 clean:
