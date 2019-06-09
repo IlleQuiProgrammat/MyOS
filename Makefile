@@ -1,12 +1,12 @@
 CXXPARAMS = -m32 -Wall -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
 ASMPARAMS = -f elf32
-LDPARAMS = 
+LDPARAMS = -m elf_i386
 CXXC = g++
 ASMC = nasm
 OBJECTS = src/kernel.o src/loader.o
 
 %.o: %.cpp
-	$(CXXC) $(GCCPARAMS) -c -o $@ $<
+	$(CXXC) $(CXXPARAMS) -c -o $@ $<
 
 %.o: %.asm
 	$(ASMC) $(ASMPARAMS) -o $@ $<
