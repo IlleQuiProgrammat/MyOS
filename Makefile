@@ -1,18 +1,18 @@
-CXXPARAMS = -m32 -Wall -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
-ASMPARAMS = -f elf32
+CPARAMS = -ffreestanding -O2 -Wall -Wextra
+ASMPARAMS =
 LDPARAMS = -m elf_i386
-CXXC = g++
-ASMC = nasm
+CC = i686-elf-gcc
+ASMC = i686-elf-as
 OBJECTS = src/kernel.o src/loader.o
 
-%.o: %.cpp
-	$(CXXC) $(CXXPARAMS) -c -o $@ $<
+%.o: %.c
+	$(CC) $(CPARAMS) -c $< -o $@
 
-%.o: %.asm
+%.o: %.s
 	$(ASMC) $(ASMPARAMS) -o $@ $<
 
 mykernel.bin: src/linker.ld $(OBJECTS)
-	ld $(LDPARAMS) -T $< -o $@ src/*.o
+	i686-elf-ld $(LDPARAMS) -T $< -o $@ src/*.o
 
 mykernel.iso: mykernel.bin
 	cp mykernel.bin iso/boot/mykernel.bin

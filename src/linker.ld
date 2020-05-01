@@ -1,27 +1,29 @@
-ENTRY(loader)
+ENTRY(_start)
 
 SECTIONS
 {
-    . = 0x0100000;
-    .text :
+    . = 1M;
+    .text BLOCK(4K) : ALIGN(4K)
     {
         *(.multiboot)
         *(.text*)
-        *(.rodata)
     }
-    .data :
-    {
-        start_ctors = .;
-        KEEP(*(.init_array));
-        KEEP(*(SORT_BY_INIT_PRIORITY( .init_array.* )));
-        end_ctors = .;   
+
+	.rodata BLOCK(4K) : ALIGN(4K)
+	{
+		*(.rodata)
+	}
+
+    .data BLOCK(4K) : ALIGN(4K)
+    { 
         *(.data)
     }
-    . = 0x0300000;
-    .bss :
+
+    .bss BLOCK(4K) : ALIGN(4K)
     {
         *(.bss)
     }
+    
     /DISCARD/ :
     {
         *(.fini_array*)
