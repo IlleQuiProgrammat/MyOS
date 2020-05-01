@@ -8,6 +8,9 @@ extern "C" {
 #endif
 
 __attribute__((__noreturn__))
+void panic(const char* message);
+
+__attribute__((__noreturn__))
 void abort(void);
 
 #ifdef __cplusplus

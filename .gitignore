@@ -5,6 +5,7 @@ sysroot/
 *.bin
 *.iso
 *.kernel
+isodir/
 iso/
 .vscode
 cross-compiler
