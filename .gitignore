@@ -4,5 +4,7 @@
 sysroot/
 *.bin
 *.iso
+*.kernel
+iso/
 .vscode
 cross-compiler
