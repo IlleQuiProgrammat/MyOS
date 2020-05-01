@@ -27,8 +27,13 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
-	mov $stack_top, %esp
+	movl $stack_top, %esp
+	# Call the global constructors
+	call _init
+
 	call kernel_main
+
+	call _fini
  
 	cli					/* Clear interrupt table */
 1:	hlt					/* Halt interrupt should freeze computer */
