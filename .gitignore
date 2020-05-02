@@ -9,3 +9,5 @@ isodir/
 iso/
 .vscode
 cross-compiler
+qloader2/
+*.img

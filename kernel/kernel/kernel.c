@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include <kernel/tty.h>
+#include <kernel/gdt.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,7 +15,9 @@
 // }
 
 void kernel_main(void) {
-	/* Initialize terminal interface */
+	GlobalDescriptorTable gdt;
+	InitialiseGDT(&gdt);
+
 	terminal_initialize();
     terminal_setcolour(get_vga_colour(VGA_COLOUR_CYAN, VGA_COLOUR_BLACK));
 
