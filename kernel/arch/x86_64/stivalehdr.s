@@ -16,7 +16,7 @@ struct stivale_header {
 
 */
 
-.section .stivalehdr
+.section stivalehdr
 .align 4
 stivale_header:
 .quad 0xeffff0

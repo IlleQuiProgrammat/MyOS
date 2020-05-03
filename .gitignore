@@ -12,3 +12,4 @@ cross-compiler
 qloader2/
 *.img
 mnt
+*.ker
