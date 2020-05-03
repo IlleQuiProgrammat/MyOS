@@ -1,5 +1,5 @@
 #!/bin/sh
 set -e
-. ./iso.sh
+. ./img.sh
 
-qemu-system-$(./target-triplet-to-arch.sh $HOST) -cdrom lightrod.iso
+qemu-system-$(./target-triplet-to-arch.sh $HOST) lightrod.img
