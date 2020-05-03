@@ -6,6 +6,7 @@
 #include <kernel/gdt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <kernel/stivale.h>
 
 // size_t strlen(const char* str) {
 // 	size_t len = 0;
@@ -14,7 +15,7 @@
 // 	return len;
 // }
 
-void kernel_main(void) {
+void kernel_main(stivale_struct* stivale_info) {
 	GlobalDescriptorTable gdt;
 	InitialiseGDT(&gdt);
 

@@ -21,9 +21,12 @@ uint8_t GetTypeFromSegment(SegmentDescriptor* segment);
 
 typedef struct GlobalDescriptorTable_t {
     SegmentDescriptor nullSegmentSelector;
-    SegmentDescriptor unusedSegmentSelector;
-    SegmentDescriptor codeSegmentSelector;
-    SegmentDescriptor dataSegmentSelector;
+    SegmentDescriptor kernelCode64SegmentSelector;
+    SegmentDescriptor kernelDataSelector;
+    SegmentDescriptor userDataSegmentSelector;
+    SegmentDescriptor userCode64SegmentSelector;
+    // TODO: When we implement task scheduling
+    // SegmentDescriptor TSSSegmentSelector;
 }__attribute__((packed)) GlobalDescriptorTable;
 
 void InitialiseGDT(GlobalDescriptorTable* gdt);

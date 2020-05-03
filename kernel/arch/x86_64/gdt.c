@@ -3,7 +3,8 @@
 
 
 // Would require some sort of malloc :(... struct SegmentDescriptor* GetSegmentDescriptor(uint32_t base, uint32_t limit, uint8_t type) {}
-void SetSegmentDescriptor(SegmentDescriptor* segment, uint32_t base, uint32_t limit, uint8_t type) {
+void SetSegmentDescriptor(SegmentDescriptor* segment, uint32_t base,
+                uint32_t limit, uint8_t type) {
     uint8_t* chunked = (uint8_t*)segment;
 
     if (limit < (1 << 16)) {
@@ -63,10 +64,11 @@ uint8_t GetTypeFromSegment(SegmentDescriptor* segment) {
 
 void InitialiseGDT(GlobalDescriptorTable* gdt_ptr) {
     SetSegmentDescriptor(&(gdt_ptr->nullSegmentSelector), 0,0,0);
-    SetSegmentDescriptor(&(gdt_ptr->unusedSegmentSelector), 0, 0, 0);
-    SetSegmentDescriptor(&(gdt_ptr->codeSegmentSelector), 0, 64*1024*1024, 0x9A);
-    SetSegmentDescriptor(&(gdt_ptr->dataSegmentSelector), 0, 64*1024*1024, 0x92);
-    int n_gdt_entries = 4;
+    SetSegmentDescriptor(&(gdt_ptr->kernelCode64SegmentSelector), 0, 0, 0);
+    SetSegmentDescriptor(&(gdt_ptr->kernelDataSelector), 0, 64*1024*1024, 0x9A);
+    SetSegmentDescriptor(&(gdt_ptr->userDataSegmentSelector), 0, 64*1024*1024, 0x92);
+    SetSegmentDescriptor(&(gdt_ptr->userCode64SegmentSelector), 0, 64*1024*1024, 0x92);
+    int n_gdt_entries = 5;
     
     struct {
         uint32_t ptr;
