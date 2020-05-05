@@ -2,7 +2,7 @@ ENTRY(kernel_main)
 
 SECTIONS
 {
-    kernel_phys_offset = 0xffffffff80000000;
+    . = 0xffffffff80100000;
 
     .stivalehdr ALIGN(4K) :
     {

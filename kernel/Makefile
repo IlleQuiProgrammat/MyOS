@@ -1,74 +1,63 @@
-include ../make.config
+CC = x86_64-elf-gcc
+AS = x86_64-elf-as
+LD = x86_64-elf-ld
+AR = x86_64-elf-ar
 
-HOST?=DEFAULT_HOST
+PROJDIRS = kernel include arch/x86_64
 
-CFLAGS?=-O2 -g
-CPPFLAGS?=
-LDFLAGS?=
-LIBS?=
+ASMFILES := $(shell find $(PROJDIRS) -type f -name "*.S")
+SRCFILES := $(shell find $(PROJDIRS) -type f -name "*.c")
+HDRFILES := $(shell find $(PROJDIRS) -type f -name "*.h")
 
-DESTDIR?=$(SYSROOT)
-PREFIX?=$(SYSROOT)
-EXEC_PREFIX?=$(PREFIX)
-BOOTDIR?=$(EXEC_PREFIX)/boot
-INCLUDEDIR?=$(PREFIX)/include
+ASMOBJFILES := $(patsubst %.S,%.o,$(ASMFILES))
+OBJFILES := $(patsubst %.c,%.o,$(SRCFILES))
+DEPFILES := $(patsubst %.c,%.d,$(SRCFILES))
 
-CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra -mcmodel=kernel
-CPPFLAGS:=$(CPPFLAGS) -D__is_kernel -Iinclude
-LDFLAGS:=$(LDFLAGS)
-LIBS:=$(LIBS) -nostdlib -lk -lgcc
 
-ARCHDIR=arch/$(HOSTARCH)
+CFLAGS ?= -O2 -g
+CWARNINGS ?= -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
+			-Wwrite-strings -Wmissing-prototypes -Wmissing-declarations \
+			-Wredundant-decls -Wnested-externs -Winline -Wno-long-long \
+			-Wconversion -Wstrict-prototypes
 
-include $(ARCHDIR)/make.config
+CFLAGS := $(CFLAGS) -ffreestanding -mcmodel=kernel $(CWARNINGS) -I../sysroot/usr/include -L../sysroot/usr/lib -llibk
 
-CFLAGS:=$(CFLAGS) $(KERNEL_ARCH_CFLAGS)
-CPPFLAGS:=$(CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
-LDFLAGS:=$(LDFLAGS) $(KERNEL_ARCH_LDFLAGS)
-LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
+ASFLAGS ?=
+ASFLAGS :=
 
-KERNEL_OBJS=\
-$(KERNEL_ARCH_OBJS) \
-kernel/kernel.o \
+LDFLAGS ?=
+LDFLAGS := $(LDFLAGS)
 
-OBJS=\
-$(KERNEL_OBJS) \
+.PHONY: all clean dist check testdrivers todolist
 
-LINK_LIST=\
-$(LDFLAGS) \
-$(KERNEL_OBJS) \
-$(LIBS) \
+all: lightrod.kernel
 
-.PHONY: all clean install install-headers install-kernel
-.SUFFIXES: .o .c .S
-
-all: lightrod.ker
-
-lightrod.ker: $(OBJS) $(ARCHDIR)/linker.ld
-	$(CC) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
-
-$(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
-	OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
-
-.c.o:
-	$(CC) -MD -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
-
-.S.o:
-	$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
+lightrod.kernel: $(OBJFILES) $(ASMOBJFILES)
+	ld -T ./arch/x86_64/linker.ld $? -o lightrod.kernel -lk -L../sysroot/usr/lib/
 
 clean:
-	rm -f lightrod.ker
-	rm -f $(OBJS) *.o */*.o */*/*.o
-	rm -f $(OBJS:.o=.d) *.d */*.d */*/*.d
+	-@$(RM) $(wildcard $(OBJFILES) $(DEPFILES) $(TSTFILES) libk.a libk.tgz)
 
-install: install-headers install-kernel
+dist:
+	@tar czf libk.tgz $(ALLFILES)
 
-install-headers:
-	mkdir -p $(DESTDIR)$(INCLUDEDIR)
-	cp -R --preserve=timestamps include/. $(DESTDIR)$(INCLUDEDIR)/.
+-include $(DEPFILES)
 
-install-kernel: lightrod.ker
-	mkdir -p $(DESTDIR)$(BOOTDIR)
-	cp lightrod.ker $(DESTDIR)$(BOOTDIR)
+todolist:
+	-@for file in $(ALLFILES:Makefile=); do fgrep -H -e TODO -e FIXME $$file; done; true
 
--include $(OBJS:.o=.d)
+%.o: %.c Makefile
+	@$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+
+%.o: %.S
+	@$(AS) $< -o $@
+
+THISDIR := $(shell basename `pwd`)
+TODAY := $(shell date +%Y-%m-%d)
+BACKUPDIR := projectBackups/$(TODAY)
+
+backup: clean
+	@tar cf - ../$(THISDIR) | 7za a -si ../$(BACKUPDIR)/$(THISDIR).$(TODAY)_`date +%H%M`.tar.7z
+
+move_sysroot:
+	@cp ./lightrod.kernel ../sysroot/boot/lightrod.kernel
